@@ -13,6 +13,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", socket => {
   console.log("WebSocket Connection...");
+
+  socket.emit("message", "Hi This is a realtime app!");
 });
 
 const PORT = process.env.PORT || 8080;
