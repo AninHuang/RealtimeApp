@@ -4,6 +4,14 @@ const chatMessages = document.querySelector(".chat-messages");
 // 所以這裡可存取到 io()
 const socket = io();
 
+// 取得 URL 資訊
+// location.search -> ?username=Anin&room=JavaScript
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true
+});
+
+socket.emit("joinRoom", { username, room });
+
 socket.on("message", message => {
   console.log(message);
   outputMessage(message);
@@ -28,9 +36,9 @@ function outputMessage(message) {
 
   div.classList.add("message");
   div.innerHTML = `
-  <p class="meta">Brad <span>9:12pm</span></p>
+  <p class="meta">${message.username} <span>${message.time}</span></p>
   <p class="text">
-    ${message}
+    ${message.text}
   </p>
   `;
   chatMessages.appendChild(div);
