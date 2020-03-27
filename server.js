@@ -37,16 +37,36 @@ io.on("connection", socket => {
         "message",
         formatMessage(bot, `${username} has joined the chat room`)
       );
+
+    // 發送新進入聊天室的使用者和相關資訊
+    io.to(user.room).emit("roomUsers", {
+      room: user.room,
+      users: getRoomUsers(user.room)
+    });
   });
 
   socket.on("chatMsg", msg => {
-    console.log(msg);
-    io.emit("message", formatMessage("USER", msg));
+    const user = getCurrentUser(socket.id);
+
+    io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
 
   socket.on("disconnect", () => {
-    // 對所有線上 socket 傳訊息
-    io.emit("message", formatMessage(bot, "A user has left the chat room"));
+    const user = userLeave(socket.id);
+
+    if (user) {
+      // 對所有線上 socket 傳訊息
+      io.to(user.room).emit(
+        "message",
+        formatMessage(bot, `${user.username} has left the chat room`)
+      );
+
+      // 發送離開聊天室的使用者和相關資訊，以移除前端左側 sidebar 使用者列表
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      });
+    }
   });
 });
 
