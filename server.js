@@ -12,9 +12,17 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", socket => {
-  console.log("WebSocket Connection...");
-
+  // 歡迎新進入的使用者
+  // 對一個特定的 socket 傳訊息
   socket.emit("message", "Hi This is a realtime app!");
+
+  // 對目前 socket 之外所有線上的 socket 傳訊息
+  socket.broadcast.emit("message", "A user has joined the chat room");
+
+  socket.on("disconnect", () => {
+    // 對所有線上 socket 傳訊息
+    io.emit("message", "A user has left the chat room");
+  });
 });
 
 const PORT = process.env.PORT || 8080;
