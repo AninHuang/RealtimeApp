@@ -23,6 +23,11 @@ io.on("connection", socket => {
     // 對所有線上 socket 傳訊息
     io.emit("message", "A user has left the chat room");
   });
+
+  socket.on("chatMsg", msg => {
+    console.log(msg);
+    io.emit("message", msg);
+  });
 });
 
 const PORT = process.env.PORT || 8080;
